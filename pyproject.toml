@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "factorio-setup-cli"
+version = "0.1.0"
+description = ""
+authors = ["miragecentury <victorien.vanroye@gmail.com>"]
+readme = "README.md"
+packages = [{include = "factorio", from = "src"}]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+typer = {version = "~0.9.0", extras = ["all"]}
+
+[tool.poetry.group.test.dependencies]
+isort = "^5.12.0"
+black = "^23.7.0"
+pytest = "^7.4.0"
+
+[tool.poetry.group.dev.dependencies]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
