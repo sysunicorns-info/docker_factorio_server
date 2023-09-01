@@ -27,6 +27,8 @@ class FactorioCliSettings(BaseSettings):
 
     server_download_version_tag: str = Field(default="{version}")
 
+    server_download_dir_path_default: str = Field(default="/tmp/factorio_cli_tmp")
+
 
 class FactorioUserAccountSettings(BaseSettings):
     """

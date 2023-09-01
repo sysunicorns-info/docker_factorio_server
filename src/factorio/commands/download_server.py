@@ -27,7 +27,7 @@ class FactorioServerDownloaderCommand:
     def __init__(
         self,
         factorio_server_downloader_service: FSDownloaderService = FSDownloaderService(
-            factorio_cli_settings=FactorioCliSettings(), target_dir=Path("/tmp")
+            factorio_cli_settings=FactorioCliSettings()
         ),
     ) -> None:
         """
@@ -63,6 +63,8 @@ class FactorioServerDownloaderCommand:
         Download Factorio Server
         """
 
+        # TODO: Add override of the path to download to
+
         # Validate the version and re-raise in case of error
         # to let Typer handle it
         try:
@@ -71,11 +73,6 @@ class FactorioServerDownloaderCommand:
             raise typer.BadParameter(error)
 
         # Setup the download directory and download the server
-        if not self._factorio_server_downloader_service.setup_download_dir():
-            rich.print(
-                "[red]Error:[/] Could not setup download directory",
-            )
-            raise typer.Exit(code=1)
         if not self._factorio_server_downloader_service.download(version=version):
             rich.print(
                 "[red]Error:[/] Could not download Factorio Server",
