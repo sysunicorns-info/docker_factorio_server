@@ -12,3 +12,4 @@ class ServerError(StrEnum):
 
     GENERIC = auto()
     UNABLE_TO_DOWNLOAD = auto()
+    UNABLE_TO_GET_CHECKSUM = auto()
