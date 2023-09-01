@@ -2,8 +2,6 @@
 Checksum builder.
 """
 
-
-import rich
 from httpx import Response
 
 from .objects import CheckSumsData, CheckSumsFile

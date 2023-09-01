@@ -1,6 +1,7 @@
 """
 Provide Service to download Factorio Server
 """
+import hashlib
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -96,6 +97,30 @@ class FactorioServerDownloaderService:
         """
         self._target_dir = path
 
+    def _calculate_checksum(self, file_path: Path) -> str:
+        """
+        Calculate the checksum for the given file.
+        """
+        _hash = hashlib.sha256()
+        _hash.update(file_path.read_bytes())
+        return _hash.hexdigest()
+
+    def _check_if_file_exist_in_target_dir_with_correct_checksum(
+        self, file_name: str
+    ) -> bool:
+        """
+        Check if the file already exists in the target directory.
+        """
+        if not (self._target_dir / file_name).exists():
+            return False
+
+        if self._checksums.checksum_by_filename[
+            file_name
+        ].checksum != self._calculate_checksum(self._target_dir / file_name):
+            return False
+
+        return True
+
     def download(self, version: str) -> Tuple[bool, Path | ServerError]:
         """
         Download the server for the given version.
@@ -125,5 +150,25 @@ class FactorioServerDownloaderService:
         rich.print(_download_information)
 
         # Check if the file already exists
+        if self._check_if_file_exist_in_target_dir_with_correct_checksum(
+            _download_information.file_name
+        ):
+            rich.print(
+                f"File {_download_information.file_name} already exists in {_download_information.file_name}"
+            )
+            return True, self._target_dir / _download_information.file_name
+
+        # Write the file
+        with open(self._target_dir / _download_information.file_name, "wb") as _file:
+            _file.write(_response.content)
+
+        # Check if the checksum is correct
+        if (
+            self._calculate_checksum(self._target_dir / _download_information.file_name)
+            != self._checksums.checksum_by_filename[
+                _download_information.file_name
+            ].checksum
+        ):
+            return False, ServerError.CHECKSUM_MISMATCH
 
         return True, self._target_dir / _download_information.file_name
