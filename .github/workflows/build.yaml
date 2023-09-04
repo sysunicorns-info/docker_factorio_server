@@ -27,7 +27,6 @@ jobs:
           poetry install
       - name: Build wheels
         run: |
-          . ${GITHUB_WORKSPACE}/.venv/bin/activate
           # Prepare requirements.txt for dependencies
           poetry export -f requirements.txt --output ${GITHUB_WORKSPACE}/dist/requirements.txt --without=dev,test --with-credentials
           mkdir -p ${GITHUB_WORKSPACE}/dist/wheels
