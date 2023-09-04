@@ -20,4 +20,4 @@ RUN . /opt/app/.venv/bin/activate && pip install -r /opt/app/dist/requirements.t
 RUN . /opt/app/.venv/bin/activate && pip install /opt/app/dist/wheels/factorio_setup_cli-*.whl
 RUN . /opt/app/.venv/bin/activate && python -m factorio server download latest --tmp=/opt/app/tmp --install-dir=/opt/app/factorio && rm -rf /opt/app/tmp
 
-CMD [ "/opt/app/factorio/bin/x64/factorio", "--start-server", "${FACTORIO_SAVE_PATH}", "--server-settings", "/opt/app/server-settings.json" ]
+CMD [ "/opt/app/factorio/factorio/bin/x64/factorio", "--start-server", "${FACTORIO_SAVE_PATH}", "--server-settings", "/opt/app/server-settings.json" ]
