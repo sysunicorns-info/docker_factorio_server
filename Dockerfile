@@ -18,6 +18,6 @@ COPY dist/requirements.txt /opt/app/dist/requirements.txt
 RUN python3.11 -m venv /opt/app/.venv
 RUN . /opt/app/.venv/bin/activate && pip install -r /opt/app/dist/requirements.txt --no-index --find-links=/opt/app/dist/wheels
 RUN . /opt/app/.venv/bin/activate && pip install /opt/app/dist/wheels/factorio_setup_cli-*.whl
-RUN . /opt/app/.venv/bin/activate && python -m factorio server download latest --tmp=/opt/app/tmp --install-dir=/opt/app/factorio && rm -rf /opt/app/tmp
+RUN . /opt/app/.venv/bin/activate && python -m factorio server download 1.1.87 --tmp=/opt/app/tmp --install-dir=/opt/app/factorio && rm -rf /opt/app/tmp
 
 CMD [ "/opt/app/factorio/factorio/bin/x64/factorio", "--start-server", "${FACTORIO_SAVE_PATH}", "--server-settings", "/opt/app/server-settings.json" ]
