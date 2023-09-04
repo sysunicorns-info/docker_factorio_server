@@ -10,6 +10,8 @@ on:
 
 env:
     PYTHON-VERSION: 3.11
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -45,6 +47,12 @@ jobs:
           ls ${GITHUB_WORKSPACE}/dist/
           mv ${GITHUB_WORKSPACE}/dist/*.whl ${GITHUB_WORKSPACE}/dist/wheels
           ls ${GITHUB_WORKSPACE}/dist/wheels
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker Image
         run: |
           docker build \
@@ -53,3 +61,7 @@ jobs:
             -t ${GITHUB_REPOSITORY}:${GITHUB_SHA} \
             ${GITHUB_WORKSPACE}
           docker tag ${GITHUB_REPOSITORY}:${GITHUB_SHA} ${GITHUB_REPOSITORY}:latest
+      - name: Push Docker Image
+        run: |
+          docker push ${GITHUB_REPOSITORY}:${GITHUB_SHA}
+          docker push ${GITHUB_REPOSITORY}:latest
