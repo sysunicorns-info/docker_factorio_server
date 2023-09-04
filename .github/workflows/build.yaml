@@ -25,15 +25,20 @@ jobs:
           python -m pip install --upgrade pip poetry
           poetry update
           poetry install
-      - name: Build wheels
+      - name: Generate requirements.txt
         run: |
+          set -eux
           # Prepare requirements.txt for dependencies
           poetry export -f requirements.txt --output ${GITHUB_WORKSPACE}/dist/requirements.txt --without=dev,test --with-credentials
           ls ${GITHUB_WORKSPACE}/dist/
+      - name: Build Wheels for Dependencies
+        run: |
           mkdir -p ${GITHUB_WORKSPACE}/dist/wheels
           # Build wheels for dependencies
           pip wheel -r ${GITHUB_WORKSPACE}/dist/requirements.txt --wheel-dir ${GITHUB_WORKSPACE}/dist/wheels
           ls ${GITHUB_WORKSPACE}/dist/wheels
+      - name: Build Wheel for Package
+        run: |
           # Build wheel for package
           poetry build -c ${GITHUB_WORKSPACE} -f wheel
           ls ${GITHUB_WORKSPACE}/dist/
