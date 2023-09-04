@@ -28,6 +28,7 @@ jobs:
       - name: Generate requirements.txt
         run: |
           set -eux
+          mkdir -p ${GITHUB_WORKSPACE}/dist
           # Prepare requirements.txt for dependencies
           poetry export -f requirements.txt --output ${GITHUB_WORKSPACE}/dist/requirements.txt --without=dev,test --with-credentials
           ls ${GITHUB_WORKSPACE}/dist/
