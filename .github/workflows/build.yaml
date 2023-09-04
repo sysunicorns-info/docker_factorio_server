@@ -63,5 +63,5 @@ jobs:
           docker tag ${GITHUB_REPOSITORY}:${GITHUB_SHA} ${GITHUB_REPOSITORY}:latest
       - name: Push Docker Image
         run: |
-          docker push ${GITHUB_REPOSITORY}:${GITHUB_SHA}
-          docker push ${GITHUB_REPOSITORY}:latest
+          docker push ${REGISTRY}/${IMAGE_NAME}:${GITHUB_SHA}
+          docker push ${REGISTRY}/${IMAGE_NAME}:latest
