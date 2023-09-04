@@ -58,9 +58,11 @@ jobs:
           docker build \
             --build-arg FACTORIO_VERSION=latest \
             --build-arg FACTORIO_SAVE_PATH=/opt/app/saves/save.zip \
-            -t ${GITHUB_REPOSITORY}:${GITHUB_SHA} \
+            -t ${IMAGE_NAME}:${GITHUB_SHA} \
             ${GITHUB_WORKSPACE}
-          docker tag ${GITHUB_REPOSITORY}:${GITHUB_SHA} ${GITHUB_REPOSITORY}:latest
+          docker tag ${IMAGE_NAME}:${GITHUB_SHA} ${REGISTRY}/${IMAGE_NAME}:${GITHUB_SHA}
+          docker tag ${IMAGE_NAME}:${GITHUB_SHA} ${IMAGE_NAME}:latest
+          docker tag ${IMAGE_NAME}:${GITHUB_SHA} ${REGISTRY}/${IMAGE_NAME}:latest
       - name: Push Docker Image
         run: |
           docker push ${REGISTRY}/${IMAGE_NAME}:${GITHUB_SHA}
