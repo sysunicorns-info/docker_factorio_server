@@ -29,15 +29,20 @@ jobs:
         run: |
           # Prepare requirements.txt for dependencies
           poetry export -f requirements.txt --output ${GITHUB_WORKSPACE}/dist/requirements.txt --without=dev,test --with-credentials
+          ls ${GITHUB_WORKSPACE}/dist/
           mkdir -p ${GITHUB_WORKSPACE}/dist/wheels
           # Build wheels for dependencies
           pip wheel -r ${GITHUB_WORKSPACE}/dist/requirements.txt --wheel-dir ${GITHUB_WORKSPACE}/dist/wheels
+          ls ${GITHUB_WORKSPACE}/dist/wheels
           # Build wheel for package
           poetry build -c ${GITHUB_WORKSPACE} -f wheel
+          ls ${GITHUB_WORKSPACE}/dist/
           mv ${GITHUB_WORKSPACE}/dist/*.whl ${GITHUB_WORKSPACE}/dist/wheels
+          ls ${GITHUB_WORKSPACE}/dist/wheels
       - name: Build Docker Image
         run: |
           docker build \
+            --context ${GITHUB_WORKSPACE} \
             --build-arg FACTORIO_VERSION=latest \
             --build-arg FACTORIO_SAVE_PATH=/opt/app/saves/save.zip \
             -t ${GITHUB_REPOSITORY}:${GITHUB_SHA} \
