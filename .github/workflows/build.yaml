@@ -48,9 +48,8 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            --context ${GITHUB_WORKSPACE} \
             --build-arg FACTORIO_VERSION=latest \
             --build-arg FACTORIO_SAVE_PATH=/opt/app/saves/save.zip \
             -t ${GITHUB_REPOSITORY}:${GITHUB_SHA} \
-            .
+            ${GITHUB_WORKSPACE}
           docker tag ${GITHUB_REPOSITORY}:${GITHUB_SHA} ${GITHUB_REPOSITORY}:latest
