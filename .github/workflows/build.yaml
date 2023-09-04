@@ -41,7 +41,7 @@ jobs:
       - name: Build Wheel for Package
         run: |
           # Build wheel for package
-          poetry build -c ${GITHUB_WORKSPACE} -f wheel
+          poetry build --directory=${GITHUB_WORKSPACE} -f wheel
           ls ${GITHUB_WORKSPACE}/dist/
           mv ${GITHUB_WORKSPACE}/dist/*.whl ${GITHUB_WORKSPACE}/dist/wheels
           ls ${GITHUB_WORKSPACE}/dist/wheels
