@@ -2,6 +2,7 @@
 Provide Service to download Factorio Server
 """
 import hashlib
+import re
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -11,8 +12,34 @@ import rich
 from factorio.configs import FactorioCliSettings
 
 from ..errors import ServerError
-from .checksum import CheckSumDataBuilder, CheckSumsData
+from .checksum import ChecksumProvider, CheckSumsData
 from .objects import DownloadInformation
+
+
+class DownloadInformationBuilder:
+    """
+    Class to build the download information from the response.
+    """
+
+    response: httpx.Response
+
+    def __init__(self, response: httpx.Response) -> None:
+        """
+        initialize the builder.
+        """
+        self.response = response
+
+    def build(self) -> DownloadInformation:
+        """
+        Build the information object from the response.
+        """
+        _file_name = Path(self.response.url.path).name
+        _file_name_split = _file_name.replace(".tar.xz", "").split("_")
+        return DownloadInformation(
+            file_name=_file_name,
+            arch=_file_name_split[2],
+            version=_file_name_split[3],
+        )
 
 
 class FactorioServerDownloaderService:
@@ -25,11 +52,14 @@ class FactorioServerDownloaderService:
 
     _checksums: CheckSumsData | None = None
 
+    _download_information_builder: type
+
     DEFAULT_SERVER_DOWNLOAD_NAME = "factorio_headless_x64_{version}.tar.xz"
 
     def __init__(
         self,
         factorio_cli_settings: FactorioCliSettings,
+        download_information_builder: type = DownloadInformationBuilder,
         target_dir: Optional[Path] = None,
     ) -> None:
         """
@@ -37,7 +67,7 @@ class FactorioServerDownloaderService:
         """
         # Set the settings
         self._factorio_cli_settings = factorio_cli_settings
-
+        self._download_information_builder = download_information_builder
         self._checksums = None
 
         # Set the target directory
@@ -48,22 +78,25 @@ class FactorioServerDownloaderService:
         else:
             self._target_dir = target_dir
 
+    def _download_checksums(self) -> Tuple[bool, None | ServerError]:
+        """
+        Download the checksums.
+        """
+        _checksum_provider = ChecksumProvider(
+            factorio_cli_settings=self._factorio_cli_settings
+        )
+        _success, _checksums_or_error = _checksum_provider.download()
+        if not _success:
+            return False, _checksums_or_error
+        self._checksums = _checksums_or_error
+        return True, None
+
     def _setup_download_dir(self) -> bool:
         """
         Prepare the download directory.
         """
         self._target_dir.mkdir(parents=True, exist_ok=True)
         return True
-
-    def _extract_information(self, response: httpx.Response) -> DownloadInformation:
-        """
-        Extract information from the request
-        """
-        _file_name = Path(response.url.path).name
-        _file_name_split = _file_name.replace(".tar.xz", "").split("_")
-        _arch = _file_name_split[2]
-        _version = _file_name_split[3]
-        return DownloadInformation(file_name=_file_name, arch=_arch, version=_version)
 
     def _build_url(self, version: str) -> str:
         """
@@ -75,21 +108,6 @@ class FactorioServerDownloaderService:
             return self._factorio_cli_settings.server_download_version_url.replace(
                 self._factorio_cli_settings.server_download_version_tag, version
             )
-
-    def _download_checksums(self) -> None:
-        """
-        Acquire the checksums.
-        """
-
-        _response = httpx.get(
-            url=self._factorio_cli_settings.server_download_checksum,
-            timeout=self._factorio_cli_settings.server_download_timeout,
-        )
-
-        if _response.status_code != 200:
-            return False, ServerError.UNABLE_TO_GET_CHECKSUM
-
-        self._checksums = CheckSumDataBuilder(response=_response).build()
 
     def set_path(self, path: Path) -> None:
         """
@@ -130,7 +148,8 @@ class FactorioServerDownloaderService:
         self._setup_download_dir()
 
         # Download the checksums
-        self._download_checksums()
+        if self._download_checksums()[0] is False:
+            return False, self._download_checksums()[1]
 
         # Build the url
         _url = self._build_url(version)
@@ -146,7 +165,9 @@ class FactorioServerDownloaderService:
             return False, ServerError.UNABLE_TO_DOWNLOAD
 
         # Extract information
-        _download_information = self._extract_information(_response)
+        _download_information: DownloadInformation = self._download_information_builder(
+            response=_response
+        ).build()
         rich.print(_download_information)
 
         # Check if the file already exists

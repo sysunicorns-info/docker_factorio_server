@@ -9,7 +9,8 @@ from .objects import CheckSumsData, CheckSumsFile
 
 class CheckSumDataBuilder:
     """
-    Class to build the CheckSumsData object.
+    Class to build the CheckSumsData object
+    from the response of the checksums API.
     """
 
     _response: Response
