@@ -5,7 +5,7 @@ DownloadInformationBuilder unit tests.
 import httpx
 import pytest
 
-from factorio.services.server.downloader.info import DownloadInformationBuilder
+from factorio.services.server.downloader.info import DownloadInfoBuilder
 
 
 class TestDownloadInformationBuilder:
@@ -18,7 +18,7 @@ class TestDownloadInformationBuilder:
         with httpx.Client() as _client:
             response = _client.get(url)
 
-        builder = DownloadInformationBuilder(response)
+        builder = DownloadInfoBuilder(response)
         download_info = builder.build()
 
         assert download_info.file_name == "factorio_headless_x64_1.1.91.tar.xz"

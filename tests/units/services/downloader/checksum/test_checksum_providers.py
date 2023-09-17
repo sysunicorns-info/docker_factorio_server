@@ -1,7 +1,10 @@
+"""
+Test the checksum provider.
+"""
+
 from unittest.mock import Mock, patch
 
 import httpx
-import pytest
 
 from factorio.configs import FactorioCliSettings
 from factorio.services.server.downloader.checksum import ChecksumProvider, CheckSumsData
@@ -9,6 +12,10 @@ from factorio.services.server.errors import ServerError
 
 
 class TestChecksumProvider:
+    """
+    Test the ChecksumProvider class.
+    """
+
     def test_download_success(self):
         # Create a mock response object with a status code of 200 and a text attribute
         mock_response = Mock(spec=httpx.Response)
@@ -25,7 +32,7 @@ class TestChecksumProvider:
             provider = ChecksumProvider(factorio_cli_settings=mock_settings)
             success, data = provider.download()
 
-        assert success == True
+        assert success is True
         assert isinstance(data, CheckSumsData)
 
     def test_download_failure(self):
@@ -43,5 +50,5 @@ class TestChecksumProvider:
             provider = ChecksumProvider(factorio_cli_settings=mock_settings)
             success, error = provider.download()
 
-        assert success == False
+        assert success is False
         assert error == ServerError.UNABLE_TO_GET_CHECKSUM
