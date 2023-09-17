@@ -13,33 +13,11 @@ from factorio.configs import FactorioCliSettings
 
 from ..errors import ServerError
 from .checksum import ChecksumProvider, CheckSumsData
-from .objects import DownloadInformation
-
-
-class DownloadInformationBuilder:
-    """
-    Class to build the download information from the response.
-    """
-
-    response: httpx.Response
-
-    def __init__(self, response: httpx.Response) -> None:
-        """
-        initialize the builder.
-        """
-        self.response = response
-
-    def build(self) -> DownloadInformation:
-        """
-        Build the information object from the response.
-        """
-        _file_name = Path(self.response.url.path).name
-        _file_name_split = _file_name.replace(".tar.xz", "").split("_")
-        return DownloadInformation(
-            file_name=_file_name,
-            arch=_file_name_split[2],
-            version=_file_name_split[3],
-        )
+from .info import (
+    DownloadInformation,
+    DownloadInformationBuilder,
+    DownloadInformationBuilderProtocol,
+)
 
 
 class FactorioServerDownloaderService:
@@ -52,14 +30,14 @@ class FactorioServerDownloaderService:
 
     _checksums: CheckSumsData | None = None
 
-    _download_information_builder: type
+    _download_information_builder: DownloadInformationBuilderProtocol
 
     DEFAULT_SERVER_DOWNLOAD_NAME = "factorio_headless_x64_{version}.tar.xz"
 
     def __init__(
         self,
         factorio_cli_settings: FactorioCliSettings,
-        download_information_builder: type = DownloadInformationBuilder,
+        download_information_builder: DownloadInformationBuilderProtocol = DownloadInformationBuilder,
         target_dir: Optional[Path] = None,
     ) -> None:
         """
@@ -123,21 +101,30 @@ class FactorioServerDownloaderService:
         _hash.update(file_path.read_bytes())
         return _hash.hexdigest()
 
-    def _check_if_file_exist_in_target_dir_with_correct_checksum(
-        self, file_name: str
-    ) -> bool:
+    def _retrieve_server(
+        self, version: str
+    ) -> Tuple[bool, DownloadInformation | ServerError, httpx.Response | None]:
         """
-        Check if the file already exists in the target directory.
+        Retrieve the server for the given version.
         """
-        if not (self._target_dir / file_name).exists():
-            return False
+        # Build the url
+        _url = self._build_url(version)
 
-        if self._checksums.checksum_by_filename[
-            file_name
-        ].checksum != self._calculate_checksum(self._target_dir / file_name):
-            return False
+        # Download the server
+        _response = httpx.get(
+            url=_url,
+            timeout=self._factorio_cli_settings.server_download_timeout,
+            follow_redirects=True,
+        )
+        if _response.status_code != 200:
+            return False, ServerError.UNABLE_TO_DOWNLOAD, None
 
-        return True
+        # Extract information
+        _download_information: DownloadInformation = self._download_information_builder(
+            response=_response
+        ).build()
+
+        return True, _download_information, _response
 
     def download(self, version: str) -> Tuple[bool, Path | ServerError]:
         """
@@ -148,48 +135,33 @@ class FactorioServerDownloaderService:
         self._setup_download_dir()
 
         # Download the checksums
-        if self._download_checksums()[0] is False:
-            return False, self._download_checksums()[1]
+        _is_success, _error = self._download_checksums()
+        if _is_success is False:
+            return False, _error
 
-        # Build the url
-        _url = self._build_url(version)
-        rich.print(f"Downloading factorio server with url={_url} for version={version}")
-
-        # Download the server
-        _response = httpx.get(
-            url=_url,
-            timeout=self._factorio_cli_settings.server_download_timeout,
-            follow_redirects=True,
+        _is_success, _download_information_or_error, _response = self._retrieve_server(
+            version
         )
-        if _response.status_code != 200:
-            return False, ServerError.UNABLE_TO_DOWNLOAD
 
-        # Extract information
-        _download_information: DownloadInformation = self._download_information_builder(
-            response=_response
-        ).build()
-        rich.print(_download_information)
+        if not _is_success:
+            return False, _download_information_or_error
 
-        # Check if the file already exists
-        if self._check_if_file_exist_in_target_dir_with_correct_checksum(
-            _download_information.file_name
-        ):
-            rich.print(
-                f"File {_download_information.file_name} already exists in {_download_information.file_name}"
-            )
-            return True, self._target_dir / _download_information.file_name
-
-        # Write the file
-        with open(self._target_dir / _download_information.file_name, "wb") as _file:
-            _file.write(_response.content)
+        # Write the file if not already present
+        if not (self._target_dir / _download_information_or_error.file_name).exists():
+            with open(
+                self._target_dir / _download_information_or_error.file_name, "wb"
+            ) as _file:
+                _file.write(_response.content)
 
         # Check if the checksum is correct
         if (
-            self._calculate_checksum(self._target_dir / _download_information.file_name)
+            self._calculate_checksum(
+                self._target_dir / _download_information_or_error.file_name
+            )
             != self._checksums.checksum_by_filename[
-                _download_information.file_name
+                _download_information_or_error.file_name
             ].checksum
         ):
             return False, ServerError.CHECKSUM_MISMATCH
 
-        return True, self._target_dir / _download_information.file_name
+        return True, self._target_dir / _download_information_or_error.file_name
