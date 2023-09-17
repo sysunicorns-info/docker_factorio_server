@@ -1,5 +1,5 @@
 """
-
+Package for Factorio CLI configs.
 """
 
 from pydantic import Field
