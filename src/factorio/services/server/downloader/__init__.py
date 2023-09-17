@@ -13,11 +13,7 @@ from factorio.configs import FactorioCliSettings
 
 from ..errors import ServerError
 from .checksum import ChecksumProvider, CheckSumsData
-from .info import (
-    DownloadInformation,
-    DownloadInformationBuilder,
-    DownloadInformationBuilderProtocol,
-)
+from .info import DownloadInfoBuilder, DownloadInformation, IDownloadInfoBuilder
 
 
 class FactorioServerDownloaderService:
@@ -25,34 +21,32 @@ class FactorioServerDownloaderService:
     Class to download Factorio Server
     """
 
-    _factorio_cli_settings: FactorioCliSettings
+    _settings: FactorioCliSettings
     _target_dir: Path
 
     _checksums: CheckSumsData | None = None
 
-    _download_information_builder: DownloadInformationBuilderProtocol
+    _download_info_builder: IDownloadInfoBuilder
 
     DEFAULT_SERVER_DOWNLOAD_NAME = "factorio_headless_x64_{version}.tar.xz"
 
     def __init__(
         self,
         factorio_cli_settings: FactorioCliSettings,
-        download_information_builder: DownloadInformationBuilderProtocol = DownloadInformationBuilder,
+        download_info_builder: IDownloadInfoBuilder = DownloadInfoBuilder,
         target_dir: Optional[Path] = None,
     ) -> None:
         """
         Initialize the service.
         """
         # Set the settings
-        self._factorio_cli_settings = factorio_cli_settings
-        self._download_information_builder = download_information_builder
+        self._settings = factorio_cli_settings
+        self._download_info_builder = download_info_builder
         self._checksums = None
 
         # Set the target directory
         if target_dir is None:
-            self._target_dir = Path(
-                self._factorio_cli_settings.server_download_dir_path_default
-            )
+            self._target_dir = Path(self._settings.server_download_dir_path_default)
         else:
             self._target_dir = target_dir
 
@@ -60,9 +54,7 @@ class FactorioServerDownloaderService:
         """
         Download the checksums.
         """
-        _checksum_provider = ChecksumProvider(
-            factorio_cli_settings=self._factorio_cli_settings
-        )
+        _checksum_provider = ChecksumProvider(factorio_cli_settings=self._settings)
         _success, _checksums_or_error = _checksum_provider.download()
         if not _success:
             return False, _checksums_or_error
@@ -81,10 +73,10 @@ class FactorioServerDownloaderService:
         Build the download url for the given version.
         """
         if version == "latest":
-            return self._factorio_cli_settings.server_download_latest_url
+            return self._settings.server_download_latest_url
         else:
-            return self._factorio_cli_settings.server_download_version_url.replace(
-                self._factorio_cli_settings.server_download_version_tag, version
+            return self._settings.server_download_version_url.replace(
+                self._settings.server_download_version_tag, version
             )
 
     def set_path(self, path: Path) -> None:
@@ -113,14 +105,14 @@ class FactorioServerDownloaderService:
         # Download the server
         _response = httpx.get(
             url=_url,
-            timeout=self._factorio_cli_settings.server_download_timeout,
+            timeout=self._settings.server_download_timeout,
             follow_redirects=True,
         )
         if _response.status_code != 200:
             return False, ServerError.UNABLE_TO_DOWNLOAD, None
 
         # Extract information
-        _download_information: DownloadInformation = self._download_information_builder(
+        _download_information: DownloadInformation = self._download_info_builder(
             response=_response
         ).build()
 

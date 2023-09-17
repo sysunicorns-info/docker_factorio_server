@@ -26,7 +26,8 @@ class CheckSumsFile(BaseModel):
 
         if not any(value.endswith(ending) for ending in FILENAME_ACCEPTED_ENDINGS):
             raise ValueError(
-                f"Filename must end with one of the following: {FILENAME_ACCEPTED_ENDINGS}"
+                f"Filename must end with one of the following: "
+                f"{FILENAME_ACCEPTED_ENDINGS}"
             )
         return value
 

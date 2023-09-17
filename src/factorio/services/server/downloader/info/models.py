@@ -22,6 +22,7 @@ class DownloadInformation(BaseModel):
         """
         Validates the version string
         """
+        del info  # unused
         # Check if the version is in the format 'major.minor.patch'
         _version_split = v.split(".")
         if len(_version_split) != 3:
@@ -34,7 +35,8 @@ class DownloadInformation(BaseModel):
 
         if not (_major.isdigit() and _minor.isdigit() and _path.isdigit()):
             raise ValueError(
-                "Version must be in the format 'major.minor.patch' as each part must be a number"
+                "Version must be in the format 'major.minor.patch' "
+                "as each part must be a number"
             )
 
         return v
