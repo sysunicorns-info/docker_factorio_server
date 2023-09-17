@@ -33,6 +33,7 @@ class TestDownloadInformation:
 
         with pytest.raises(
             ValueError,
-            match="Version must be in the format 'major.minor.patch' as each part must be a number",
+            match="Version must be in the format 'major.minor.patch' "
+            "as each part must be a number",
         ):
             DownloadInformation.validate_version("1.0.a", None)

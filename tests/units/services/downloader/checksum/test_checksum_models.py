@@ -34,7 +34,8 @@ class TestCheckSumsFile:
         with pytest.raises(
             ValueError,
             match=re.escape(
-                f"Filename must end with one of the following: {FILENAME_ACCEPTED_ENDINGS}"
+                f"Filename must end with one of the following: "
+                f"{FILENAME_ACCEPTED_ENDINGS}"
             ),
         ):
             CheckSumsFile.validate_filename("invalid_file.txt")
