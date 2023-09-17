@@ -4,7 +4,7 @@ Checksum builder.
 
 from httpx import Response
 
-from .objects import CheckSumsData, CheckSumsFile
+from .models import CheckSumsData, CheckSumsFile
 
 
 class CheckSumDataBuilder:
