@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ARG FACTORIO_SAVE_PATH=/opt/app/saves/save.zip
-ARG FACTORIO_VERSION=1.1.87
+ARG FACTORIO_VERSION=1.1.91
 
 # Install dependencies
 # TODO: Remove software-properties-common to manually add deadsnakes repo
