@@ -11,6 +11,8 @@ class FactorioCliSettings(BaseSettings):
     Factorio CLI settings.
     """
 
+    server_mod_url: str = Field(default="https://mods.factorio.com/api/mods")
+
     server_download_timeout: int = Field(default=30)
 
     server_download_checksum: str = Field(
@@ -35,5 +37,6 @@ class FactorioUserAccountSettings(BaseSettings):
     Factorio user account settings.
     """
 
-    username: str
-    password: str
+    username: str = Field()
+    password: str | None = Field(default=None)
+    token: str | None = Field(default=None)
