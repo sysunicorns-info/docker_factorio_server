@@ -2,6 +2,8 @@
 Provide Command to download Factorio Server
 """
 
+import asyncio
+from math import e
 from pathlib import Path
 from tarfile import TarFile
 from typing import Optional
@@ -9,10 +11,10 @@ from typing import Optional
 import rich
 import typer
 
+from ..clients.release_info.client import ReleaseInformationClient
 from ..configs import FactorioCliSettings
-from ..services.server.downloader import (
-    FactorioServerDownloaderService as FSDownloaderService,
-)
+from ..services.server.downloader import FactorioServerDownloaderService
+from ..services.version_resolver import Version, VersionResolverService
 
 
 class FactorioServerDownloaderCommand:
@@ -24,38 +26,52 @@ class FactorioServerDownloaderCommand:
         "Version must be in the format 'major.minor.patch' or 'latest'"
     )
 
-    _factorio_server_downloader_service: FSDownloaderService
+    _factorio_server_downloader_service: FactorioServerDownloaderService
+    _version_resolver_service: VersionResolverService
 
     def __init__(
         self,
-        factorio_server_downloader_service: FSDownloaderService = FSDownloaderService(
-            factorio_cli_settings=FactorioCliSettings()
-        ),
+        factorio_cli_settings: FactorioCliSettings | None = None,
+        factorio_server_downloader_service: FactorioServerDownloaderService
+        | None = None,
+        version_resolver_service: VersionResolverService | None = None,
     ) -> None:
         """
         Initialize the command and inject the settings
         """
-        self._factorio_server_downloader_service = factorio_server_downloader_service
 
-    def _validate_version(self, version: str) -> None:
+        if factorio_cli_settings is None:
+            factorio_cli_settings = FactorioCliSettings()
+
+        if factorio_server_downloader_service is None:
+            self._factorio_server_downloader_service = FactorioServerDownloaderService(
+                factorio_cli_settings=factorio_cli_settings,
+            )
+
+        if version_resolver_service is None:
+            self._version_resolver_service = VersionResolverService(
+                release_information_client=ReleaseInformationClient(
+                    factorio_client_settings=factorio_cli_settings,
+                ),
+            )
+
+    async def _validate_version(self, version: str) -> Version:
         """
         Validate the version
+        Args:
+            version (str): The version to validate
+        Raises:
+            typer.BadParameter: If the version is invalid
+        Returns:
+            Version: The validated and resolved version
         """
 
-        # Latest is always valid
-        if version == "latest":
-            return
+        try:
+            _version = await self._version_resolver_service.resolve(version=version)
+        except ValueError as error:
+            raise typer.BadParameter(error) from error
 
-        # Check if version is in the format 'major.minor.patch'
-        _version_split = version.split(".")
-        if len(_version_split) != 3:
-            raise typer.BadParameter(self.VERSION_ERROR_MESSAGE)
-
-        for _version_part in _version_split:
-            if not _version_part.isnumeric():
-                raise typer.BadParameter(self.VERSION_ERROR_MESSAGE)
-
-        return
+        return _version
 
     def download_factorio_server(
         self,
@@ -67,21 +83,25 @@ class FactorioServerDownloaderCommand:
         Download Factorio Server
         """
 
+        _loop = asyncio.get_event_loop()
+
         # TODO: Add override of the path to download to
 
         # Validate the version and re-raise in case of error
         # to let Typer handle it
         try:
-            self._validate_version(version=version)
+            _version = _loop.run_until_complete(self._validate_version(version=version))
         except typer.BadParameter as error:
             raise typer.BadParameter(error)
+
+        rich.print(f"Downloading Factorio Server {_version!r}")
 
         if tmp is not None:
             self._factorio_server_downloader_service.set_path(path=tmp)
 
         # Setup the download directory and download the server
         _is_success, _path_or_error = self._factorio_server_downloader_service.download(
-            version=version
+            version=_version.version,
         )
         if not _is_success:
             rich.print(
@@ -89,6 +109,10 @@ class FactorioServerDownloaderCommand:
             )
             raise typer.Exit(code=1)
 
+        rich.print(f"Factorio Server downloaded to {_path_or_error}")
+
         # Install the server
         with TarFile.open(_path_or_error) as _tar_file:
             _tar_file.extractall(path=install_dir)
+
+        rich.print(f"Factorio Server installed to {install_dir}")
