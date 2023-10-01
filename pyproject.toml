@@ -26,6 +26,9 @@ pytest-cov = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 
+[tool.poetry.scripts]
+factorio = "factorio.__main__:typer_application"
+
 # pytest settings
 [tool.pytest.ini_options]
 addopts = ["--strict-markers", "--showlocals", "--tb=short", "--color=yes"]
