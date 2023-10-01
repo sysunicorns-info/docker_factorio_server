@@ -89,12 +89,15 @@ class VersionResolverService:
         except ValueError as e:
             raise ValueError(f"Invalid dynamic version: {version}") from e
 
+        if _tag_value != "latest":
+            raise ValueError(f"Invalid dynamic version: {version}")
+
         _release_information = (
             await self._release_information_client.get_latest_information()
         )
 
         try:
-            _static_version = _release_information[_channel][_tag_value]
+            _static_version = _release_information.model_dump().get(_channel)
         except KeyError as e:
             raise ValueError(f"Invalid dynamic version: {version}") from e
 
