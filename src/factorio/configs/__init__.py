@@ -11,7 +11,13 @@ class FactorioCliSettings(BaseSettings):
     Factorio CLI settings.
     """
 
-    server_mod_url: str = Field(default="https://mods.factorio.com/api/mods")
+    server_mod_client_retries: int = Field(default=3)
+    server_mod_client_base_url: str = Field(
+        default="https://mods.factorio.com/api/mods"
+    )
+
+    version_info_client_reties: int = Field(default=3)
+    version_info_base_url: str = Field(default="https://factorio.com/api")
 
     server_download_timeout: int = Field(default=30)
 
