@@ -3,7 +3,6 @@ Provide Command to download Factorio Server
 """
 
 import asyncio
-from math import e
 from pathlib import Path
 from tarfile import TarFile
 from typing import Optional
