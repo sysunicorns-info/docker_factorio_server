@@ -9,6 +9,7 @@ from .models import DownloadInformation
 
 __all__ = [
     "Architecture",
+    "IDownloadInfoBuilder",
     "DownloadInformation",
     "DownloadInfoBuilder",
 ]

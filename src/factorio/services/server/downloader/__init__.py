@@ -2,12 +2,10 @@
 Provide Service to download Factorio Server
 """
 import hashlib
-import re
 from pathlib import Path
 from typing import Optional, Tuple
 
 import httpx
-import rich
 
 from factorio.configs import FactorioCliSettings
 

@@ -12,7 +12,10 @@ def test_build_mod_list():
     # Create a temporary mod-list.json file for testing
     test_file = Path("test_mod_list.json")
     test_file.write_text(
-        '{"mods": [{"name": "Mod1", "enabled": "true"}, {"name": "Mod2", "enabled": "true"}]}'
+        '{"mods": ['
+        + '{"name": "Mod1", "enabled": "true"}, '
+        + '{"name": "Mod2", "enabled": "true"}'
+        + "]}"
     )
 
     # Test building the mod list from the temporary file
@@ -41,7 +44,9 @@ def test_file_not_valid():
     # Create a temporary mod-list.json file with invalid JSON for testing
     test_file = Path("test_mod_list.json")
     test_file.write_text(
-        '{"mods": [{"name": "Mod1", "version": "1.0.0"}, {"name": "Mod2", "version": "2.0.0"}'
+        '{"mods": ['
+        + '{"name": "Mod1", "version": "1.0.0"}, '
+        + '{"name": "Mod2", "version": "2.0.0"}'
     )
 
     # Test that a FileNotValid exception is raised when the source file is not valid
