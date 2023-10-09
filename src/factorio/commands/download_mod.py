@@ -35,6 +35,8 @@ class FactorioModDownloaderCommand:
         """
         Download the Factorio Mod
         """
+        del tmp  # unused
+        del install_dir_path  # unused
         try:
             _mod_list = ModListParser(source_file=mod_list_path).build()
         except (FileNotFound, FileNotValid) as e:

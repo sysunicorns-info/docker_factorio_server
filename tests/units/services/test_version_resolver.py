@@ -1,3 +1,7 @@
+"""
+Provides unit tests for the version resolver service.
+"""
+
 from unittest.mock import AsyncMock
 
 import pytest
@@ -11,18 +15,18 @@ from factorio.services.version_resolver import (
 )
 
 
-@pytest.fixture
-def client():
-    client = AsyncMock(spec=ReleaseInformationClient)
-    client.get_latest_information.return_value = {
+@pytest.fixture(name="client")
+def fixture_client():
+    _client = AsyncMock(spec=ReleaseInformationClient)
+    _client.get_latest_information.return_value = {
         "stable": {"latest": "1.0.0"},
         "experimental": {"latest": "1.1.0"},
     }
-    return client
+    return _client
 
 
-@pytest.fixture
-def resolver(client):
+@pytest.fixture(name="resolver")
+def fixture_resolver(client):
     return VersionResolverService(client)
 
 

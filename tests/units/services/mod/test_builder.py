@@ -46,7 +46,8 @@ def test_file_not_valid():
     test_file.write_text(
         '{"mods": ['
         + '{"name": "Mod1", "version": "1.0.0"}, '
-        + '{"name": "Mod2", "version": "2.0.0"}'
+        + '{"name": "Mod2", "version": "2.0.0"}',
+        encoding="utf-8",
     )
 
     # Test that a FileNotValid exception is raised when the source file is not valid
