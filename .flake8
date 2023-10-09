@@ -1,0 +1,4 @@
+[flake8]
+exclude = .venv, .vscode, .git, __pycache__, .pytest_cache, .mypy_cache, .tox, .eggs, *.egg, build, dist
+include = src, tests
+max-line-length = 88
