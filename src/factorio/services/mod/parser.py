@@ -24,7 +24,7 @@ class FileNotValid(Exception):
     pass
 
 
-class ModListBuilder:
+class ModListParser:
     """
     Mod List Builder
     """

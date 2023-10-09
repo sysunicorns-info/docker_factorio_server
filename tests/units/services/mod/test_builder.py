@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from factorio.services.mod.builder import FileNotFound, FileNotValid, ModListBuilder
+from factorio.services.mod.parser import FileNotFound, FileNotValid, ModListParser
 
 
 def test_build_mod_list():
@@ -19,7 +19,7 @@ def test_build_mod_list():
     )
 
     # Test building the mod list from the temporary file
-    builder = ModListBuilder(test_file)
+    builder = ModListParser(test_file)
     mod_list = builder.build()
 
     # Check that the mod list was built correctly
@@ -36,7 +36,7 @@ def test_build_mod_list():
 def test_file_not_found():
     # Test that a FileNotFound exception is raised when the source file does not exist
     with pytest.raises(FileNotFound):
-        builder = ModListBuilder(Path("nonexistent_file.json"))
+        builder = ModListParser(Path("nonexistent_file.json"))
         builder.build()
 
 
@@ -51,7 +51,7 @@ def test_file_not_valid():
 
     # Test that a FileNotValid exception is raised when the source file is not valid
     with pytest.raises(FileNotValid):
-        builder = ModListBuilder(test_file)
+        builder = ModListParser(test_file)
         builder.build()
 
     # Clean up the temporary file

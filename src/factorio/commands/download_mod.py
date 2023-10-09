@@ -5,11 +5,12 @@ Provides the Factorio Mod Downloader Command.
 from pathlib import Path
 from typing import Optional
 
+import rich
 import typer
 
 from factorio.configs import FactorioCliSettings
 from factorio.services.mod import ModDownloaderService
-from factorio.services.mod.builder import FileNotFound, FileNotValid, ModListBuilder
+from factorio.services.mod.parser import FileNotFound, FileNotValid, ModListParser
 
 
 class FactorioModDownloaderCommand:
@@ -35,7 +36,9 @@ class FactorioModDownloaderCommand:
         Download the Factorio Mod
         """
         try:
-            _mod_list = ModListBuilder(source_file=mod_list_path).build()
+            _mod_list = ModListParser(source_file=mod_list_path).build()
         except (FileNotFound, FileNotValid) as e:
             typer.echo(e)
             raise typer.Exit(code=1)
+
+        rich.print(_mod_list)
