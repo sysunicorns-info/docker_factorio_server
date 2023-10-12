@@ -8,7 +8,7 @@ import pytest
 from factorio.services.mod.parser import FileNotFound, FileNotValid, ModListParser
 
 
-def test_build_mod_list():
+def test_parser_mod_list():
     # Create a temporary mod-list.json file for testing
     test_file = Path("test_mod_list.json")
     test_file.write_text(
