@@ -38,7 +38,7 @@ class ReleaseInformationClient(AbstractClient):
             _latest_release_information = LatestReleaseInformation.model_validate_json(
                 _response.text
             )
-        except ValidationError as _e:
-            raise ReleaseInfoError() from _e
+        except (ValidationError, ValueError) as _e:
+            raise ReleaseInfoError("API Response Not Valid") from _e
 
         return _latest_release_information
