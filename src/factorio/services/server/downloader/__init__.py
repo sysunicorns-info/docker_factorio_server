@@ -14,7 +14,7 @@ from .checksum import ChecksumProvider, CheckSumsData
 from .info import DownloadInfoBuilder, DownloadInformation, IDownloadInfoBuilder
 
 
-class FactorioServerDownloaderService:
+class ServerDownloaderService:
     """
     Class to download Factorio Server
     """

@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
+            "name": "Run: Download Factorio Server",
             "purpose": [
                 "debug-in-terminal"
             ],
@@ -16,7 +16,26 @@
                 "latest",
                 "--tmp=${workspaceFolder}/tmp",
                 "--install-dir=${workspaceFolder}/dist/factorio",
-            ]
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run: Download Factorio Mods",
+            "purpose": [
+                "debug-in-terminal"
+            ],
+            "type": "python",
+            "request": "launch",
+            "module": "factorio",
+            "justMyCode": false,
+            "args": [
+                "mod",
+                "download",
+                "--tmp=${workspaceFolder}/tmp",
+                "--install-dir=${workspaceFolder}/dist/factorio",
+                "${workspaceFolder}/tmp/mod-list.json"
+            ],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

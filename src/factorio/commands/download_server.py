@@ -12,7 +12,7 @@ import typer
 
 from ..clients.release_info.client import ReleaseInformationClient
 from ..configs import FactorioCliSettings
-from ..services.server.downloader import FactorioServerDownloaderService
+from ..services.server.downloader import ServerDownloaderService
 from ..services.version_resolver import Version, VersionResolverService
 
 
@@ -25,14 +25,13 @@ class FactorioServerDownloaderCommand:
         "Version must be in the format 'major.minor.patch' or 'latest'"
     )
 
-    _factorio_server_downloader_service: FactorioServerDownloaderService
+    _factorio_server_downloader_service: ServerDownloaderService
     _version_resolver_service: VersionResolverService
 
     def __init__(
         self,
         factorio_cli_settings: FactorioCliSettings | None = None,
-        factorio_server_downloader_service: FactorioServerDownloaderService
-        | None = None,
+        factorio_server_downloader_service: ServerDownloaderService | None = None,
         version_resolver_service: VersionResolverService | None = None,
     ) -> None:
         """
@@ -41,10 +40,16 @@ class FactorioServerDownloaderCommand:
 
         if factorio_cli_settings is None:
             factorio_cli_settings = FactorioCliSettings()
+        else:
+            factorio_cli_settings = factorio_cli_settings
 
         if factorio_server_downloader_service is None:
-            self._factorio_server_downloader_service = FactorioServerDownloaderService(
+            self._factorio_server_downloader_service = ServerDownloaderService(
                 factorio_cli_settings=factorio_cli_settings,
+            )
+        else:
+            self._factorio_server_downloader_service = (
+                factorio_server_downloader_service
             )
 
         if version_resolver_service is None:
@@ -53,6 +58,8 @@ class FactorioServerDownloaderCommand:
                     factorio_client_settings=factorio_cli_settings,
                 ),
             )
+        else:
+            self._version_resolver_service = version_resolver_service
 
     async def _validate_version(self, version: str) -> Version:
         """
