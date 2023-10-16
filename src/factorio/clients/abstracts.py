@@ -17,6 +17,7 @@ class AbstractClient:
     _transport: AsyncHTTPTransport
     _settings: FactorioCliSettings
 
+    _timeout: int | None = None
     _retries: int | None = None
     _base_url: str | None = None
 
@@ -53,6 +54,8 @@ class AbstractClient:
             raise ValueError("The base url is not set")
         if self._retries is None:
             raise ValueError("The retries is not set")
+        if self._timeout is None:
+            raise ValueError("The timeout is not set")
 
     def __init__(self, factorio_client_settings: FactorioCliSettings) -> None:
         """
@@ -87,4 +90,5 @@ class AbstractClient:
         return AsyncClient(
             transport=self._transport,
             base_url=self._base_url,
+            timeout=self._timeout,
         )

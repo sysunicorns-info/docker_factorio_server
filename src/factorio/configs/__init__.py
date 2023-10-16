@@ -11,29 +11,29 @@ class FactorioCliSettings(BaseSettings):
     Factorio CLI settings.
     """
 
+    # Clients/Mods
+    server_mod_client_timeout: int = Field(default=10)
     server_mod_client_retries: int = Field(default=3)
     server_mod_client_base_url: str = Field(
         default="https://mods.factorio.com/api/mods"
     )
 
-    version_info_client_reties: int = Field(default=3)
-    version_info_base_url: str = Field(default="https://factorio.com/api")
-
-    server_download_timeout: int = Field(default=30)
-
-    server_download_checksum: str = Field(
+    # Clients/Servers
+    server_download_client_timeout: int = Field(default=10)
+    server_download_client_retries: int = Field(default=3)
+    server_download_client_base_url: str = Field(
+        default="https://www.factorio.com/get-download/"
+    )
+    server_checksum_client_timeout: int = Field(default=10)
+    server_checksum_client_retries: int = Field(default=3)
+    server_checksum_client_base_url: str = Field(
         default="https://www.factorio.com/download/sha256sums/"
     )
 
-    server_download_latest_url: str = Field(
-        default="https://www.factorio.com/get-download/latest/headless/linux64"
-    )
-
-    server_download_version_url: str = Field(
-        default="https://www.factorio.com/get-download/{version}/headless/linux64"
-    )
-
-    server_download_version_tag: str = Field(default="{version}")
+    # Clients/ReleaseInfos
+    version_info_client_timeout: int = Field(default=10)
+    version_info_client_reties: int = Field(default=3)
+    version_info_base_url: str = Field(default="https://factorio.com/api")
 
     server_download_dir_path_default: str = Field(default="/tmp/factorio_cli_tmp")
 

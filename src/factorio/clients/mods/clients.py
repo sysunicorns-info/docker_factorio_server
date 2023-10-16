@@ -21,6 +21,7 @@ class ModClient(AbstractClient):
         """
         self._base_url = self._settings.server_mod_client_base_url
         self._retries = self._settings.server_mod_client_retries
+        self._timeout = self._settings.server_mod_client_timeout
 
     async def get_mod_information(self, mod_name: str):
         """

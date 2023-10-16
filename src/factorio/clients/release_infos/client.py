@@ -22,6 +22,7 @@ class ReleaseInformationClient(AbstractClient):
 
         self._base_url = self._settings.version_info_base_url
         self._retries = self._settings.version_info_client_reties
+        self._timeout = self._settings.version_info_client_timeout
 
     async def get_latest_information(self) -> LatestReleaseInformation:
         """

@@ -4,7 +4,7 @@ Resolver for mods
 
 from pydantic import BaseModel
 
-from factorio.clients.mod import ModClient
+from factorio.clients.mods import ModClient
 from factorio.configs import FactorioCliSettings
 
 from ..parser import ModList

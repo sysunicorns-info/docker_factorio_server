@@ -5,7 +5,7 @@ Test the mod client with integration tests
 import pytest
 import rich
 
-from factorio.clients.mod.client import (
+from factorio.clients.mods.clients import (
     ModClient,
     ModClientException,
     ModInformation,
