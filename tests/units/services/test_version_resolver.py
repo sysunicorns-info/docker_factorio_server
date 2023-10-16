@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from factorio.clients.release_info.client import ReleaseInformationClient
+from factorio.clients.release_infos.client import ReleaseInformationClient
 from factorio.services.version_resolver import (
     Version,
     VersionChannel,

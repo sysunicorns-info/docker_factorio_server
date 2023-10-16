@@ -4,7 +4,7 @@ Provides the release information client
 
 from pydantic import ValidationError
 
-from factorio.clients.abstract import AbstractClient
+from factorio.clients.abstracts import AbstractClient
 
 from .exceptions import ReleaseInfoError
 from .objects import LatestReleaseInformation

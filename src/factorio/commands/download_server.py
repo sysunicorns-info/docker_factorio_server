@@ -10,7 +10,7 @@ from typing import Optional
 import rich
 import typer
 
-from ..clients.release_info.client import ReleaseInformationClient
+from ..clients.release_infos.client import ReleaseInformationClient
 from ..configs import FactorioCliSettings
 from ..services.server.downloader import ServerDownloaderService
 from ..services.version_resolver import Version, VersionResolverService

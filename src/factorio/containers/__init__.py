@@ -4,7 +4,7 @@ Provides the container for the application.
 
 from pydantic import BaseModel, ConfigDict
 
-from factorio.clients.release_info import ReleaseInformationClient
+from factorio.clients.release_infos import ReleaseInformationClient
 from factorio.configs import FactorioCliSettings
 from factorio.services.mod import ModDownloaderService
 from factorio.services.server.downloader import ServerDownloaderService

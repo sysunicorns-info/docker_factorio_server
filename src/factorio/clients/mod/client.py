@@ -4,7 +4,7 @@ Provides the client to interact with the mod portal of factorio
 
 from pydantic import ValidationError
 
-from factorio.clients.abstract import AbstractClient
+from factorio.clients.abstracts import AbstractClient
 
 from .exceptions import ModClientException
 from .objects import ModInformation, ModInformationFull

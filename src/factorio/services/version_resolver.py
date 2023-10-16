@@ -7,7 +7,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from factorio.clients.release_info.client import ReleaseInformationClient
+from factorio.clients.release_infos.client import ReleaseInformationClient
 
 
 class VersionType(StrEnum):
